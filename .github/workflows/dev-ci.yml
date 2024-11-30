@@ -1,0 +1,52 @@
+name: Dev Workflow
+
+on:
+  push:
+    branches:
+      - dev
+
+permissions:
+  contents: write
+
+jobs:
+  dev-workflow:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Install dependencies and run tests for backend
+      - name: Dependencies install for backend
+        run: |
+          cd backend
+          npm install
+
+      - name: Tests for backend
+        run: |
+          cd backend
+          npm test
+
+      # 3. Install dependencies and run tests for frontend
+      - name: Dependencies install for frontend
+        run: |
+          cd frontend
+          npm install
+
+      - name: Tests for frontend
+        run: |
+          cd frontend
+          npm test
+
+      # 4. Merge dev into mainFF
+      - name: Merge Dev into Main
+        if: success()
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: dev
+          target_branch: main
+          github_token: ${{ secrets.TOKEN }}
+
+

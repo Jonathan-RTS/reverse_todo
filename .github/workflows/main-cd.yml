@@ -58,14 +58,16 @@ jobs:
           npm test
 
       # 7. Build and Push Docker Images
-      - name: Build and Push Docker Images
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: |
-            jonathanr93/reverse_todo_frontend:latest
-            jonathanr93/reverse_todo_backend:latest
-          context: .
+           - name: Build Docker Images
+        if: success() 
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        run: docker-compose build
+
+      - name: Push Docker Images to DockerHub
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+          docker-compose push
